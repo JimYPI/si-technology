@@ -1,13 +1,13 @@
-import { type Metric } from 'web-vitals';
+import { Metric } from 'web-vitals';
 
 const reportWebVitals = async (onPerfEntry?: (metric: Metric) => void) => {
   if (onPerfEntry && onPerfEntry instanceof Function) {
-    const { onCLS, onFID, onFCP, onLCP, onTTFB } = await import('web-vitals');
-    onCLS(onPerfEntry);
-    onFID(onPerfEntry);
-    onFCP(onPerfEntry);
-    onLCP(onPerfEntry);
-    onTTFB(onPerfEntry);
+    const { getCLS, getFID, getFCP, getLCP, getTTFB } = await import('web-vitals');
+    getCLS(onPerfEntry);
+    getFID(onPerfEntry);
+    getFCP(onPerfEntry);
+    getLCP(onPerfEntry);
+    getTTFB(onPerfEntry);
   }
 };
 

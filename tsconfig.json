@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2015",
     "lib": [
       "dom",
       "dom.iterable",
@@ -20,7 +20,9 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": "src",
-    "types": ["vitest/globals", "node", "@testing-library/jest-dom"]
+    "downlevelIteration": true
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }

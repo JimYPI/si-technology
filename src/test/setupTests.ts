@@ -1,34 +1,34 @@
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
 import { TextEncoder, TextDecoder } from 'util';
 
 // Mock TextEncoder/TextDecoder
-class MockTextDecoder {
-  decode(input?: BufferSource, options?: TextDecodeOptions): string {
-    return '';
-  }
-}
-
 class MockTextEncoder {
-  encode(input?: string): Uint8Array {
-    return new Uint8Array();
+  encode(input: string): Uint8Array {
+    return new Uint8Array(Buffer.from(input));
   }
 }
 
-(global as any).TextEncoder = MockTextEncoder;
-(global as any).TextDecoder = MockTextDecoder;
+class MockTextDecoder {
+  decode(input?: Uint8Array): string {
+    if (!input) return '';
+    return Buffer.from(input).toString();
+  }
+}
+
+global.TextEncoder = MockTextEncoder as any;
+global.TextDecoder = MockTextDecoder as any;
 
 // Mock localStorage
 const localStorageMock = {
   length: 0,
-  key: vi.fn((index: number) => null),
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
+  key: jest.fn((index: number) => null),
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
 } as Storage;
 
-(global as any).localStorage = localStorageMock;
+global.localStorage = localStorageMock;
 
 // Mock navigator.language
 Object.defineProperty(window.navigator, 'language', {
@@ -36,24 +36,18 @@ Object.defineProperty(window.navigator, 'language', {
   configurable: true,
 });
 
-// Mock ResizeObserver
-class MockResizeObserver implements ResizeObserver {
-  constructor(callback: ResizeObserverCallback) {}
-  observe(target: Element, options?: ResizeObserverOptions): void {}
-  unobserve(target: Element): void {}
-  disconnect(): void {}
-}
-
-(global as any).ResizeObserver = MockResizeObserver;
-
 // Mock IntersectionObserver
 class MockIntersectionObserver implements IntersectionObserver {
-  readonly root: Element | Document | null = null;
-  readonly rootMargin: string = '0px';
-  readonly thresholds: ReadonlyArray<number> = [0];
-  
-  constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {}
-  
+  readonly root: Element | null = null;
+  readonly rootMargin: string = '';
+  readonly thresholds: ReadonlyArray<number> = [];
+
+  constructor(private callback: IntersectionObserverCallback) {
+    this.observe = jest.fn();
+    this.unobserve = jest.fn();
+    this.disconnect = jest.fn();
+  }
+
   observe(target: Element): void {}
   unobserve(target: Element): void {}
   disconnect(): void {}
@@ -62,28 +56,43 @@ class MockIntersectionObserver implements IntersectionObserver {
   }
 }
 
-(global as any).IntersectionObserver = MockIntersectionObserver;
+global.IntersectionObserver = MockIntersectionObserver as any;
 
-// Mock window.matchMedia
+// Mock ResizeObserver
+class MockResizeObserver implements ResizeObserver {
+  constructor() {
+    this.observe = jest.fn();
+    this.unobserve = jest.fn();
+    this.disconnect = jest.fn();
+  }
+
+  observe(target: Element): void {}
+  unobserve(target: Element): void {}
+  disconnect(): void {}
+}
+
+global.ResizeObserver = MockResizeObserver as any;
+
+// Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: jest.fn().mockImplementation((query: string) => ({
     matches: false,
     media: query,
     onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
   })),
 });
 
 // Mock fetch
-global.fetch = vi.fn();
+global.fetch = jest.fn();
 
 // Clean up after each test
 afterEach(() => {
-  vi.clearAllMocks();
+  jest.clearAllMocks();
   localStorage.clear();
 });
