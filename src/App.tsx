@@ -6,6 +6,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute'; // Assuming this is where ProtectedRoute is defined
 import { ThemeProvider, CssBaseline } from '@mui/material'; // Assuming you're using Material UI
 import theme from './theme'; // Assuming you have a theme defined
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Main Pages
 import HomePage from './pages/HomePage';
@@ -184,6 +185,7 @@ function App() {
                 <Route path="/industries/retail" element={<RetailSolutionsPage />} />
                 <Route path="/industries/banking" element={<BankingSolutionsPage />} />
               </Routes>
+              <SpeedInsights />
             </Layout>
           </Router>
         </ThemeProvider>
